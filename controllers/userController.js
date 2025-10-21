@@ -1,8 +1,73 @@
 import { User } from "../models.js";
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+
+
+const getToken = (id, email)=>{
+    return jwt.sign({id, email}, String(process.env.PRIVATEKEY), {expiresIn:'10h'})
+}
 
 class UserController {
+
+    async registration(req, res, next){
+        console.log(req.body)
+        const {email, password, first_name, last_name, avatar} = req.body
+        if (!email || !password){
+            return next(Error("Не корректно указаны email или password"))
+        }
+
+
+        const visiter = await User.findOne({where:{
+            email:email
+        }})
+        if (visiter){
+            return next(Error("Пользователь с таким email уже зарегистрирован"))
+        }
+        // console.log("Пользователь зареган")
+
+        const hashedPassword = await bcrypt.hash(password, 3)
+        const newUser = await User.create({
+            email:email,
+            password:hashedPassword,
+            first_name:first_name,
+            last_name:last_name,
+            avatar:avatar
+
+        })
+
+        const token = getToken(newUser.id, newUser.email)
+
+
+        res.json(token)
+
+        
+
+    }
+    async login(req, res, next){
+        console.log(req.body)
+
+        const {email, password} = req.body
+        const visiter = await User.findOne({where:{
+            email:email
+        }})
+
+        if(!visiter) {
+            return next(Error("Пользователь с данным email не зарегистрирован"))
+        }
+
+
+        const comprasion = bcrypt.compareSync(password, visiter.password)
+
+        if (!comprasion){
+            return next(Error("Вы ввели не верный пароль"))
+        }
+
+        const token = getToken(visiter.id, visiter.email)
+
+        res.json(token)
+    }
     
     async create(req, res) {
 
