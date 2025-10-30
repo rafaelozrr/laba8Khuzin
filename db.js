@@ -4,7 +4,7 @@ import { Sequelize } from "sequelize";
 
 const seq = new Sequelize(String(process.env.DBNAME), String(process.env.DBUSER), String(process.env.DBPASS), {
     host: String(process.env.HOST),
-    port: Number(process.env.PORT),
+    port: Number(process.env.DBPORT),
     dialect: "mysql"
 });
 

@@ -3,6 +3,7 @@ import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import mailService from '../mailService.js'
 
 
 const getToken = (id, email)=>{
@@ -26,16 +27,22 @@ class UserController {
             return next(Error("Пользователь с таким email уже зарегистрирован"))
         }
         // console.log("Пользователь зареган")
-
+        const activationLink = uuidv4();
         const hashedPassword = await bcrypt.hash(password, 3)
         const newUser = await User.create({
             email:email,
             password:hashedPassword,
             first_name:first_name,
             last_name:last_name,
-            avatar:avatar
+            avatar:avatar,
+            activationLink:activationLink,
+            activeted: false
 
         })
+
+      
+
+        mailService.sendActivationLink(newUser.email, `http://${process.env.HOST}:${process.env.PORT}/api/users/activate/${activationLink}`)
 
         const token = getToken(newUser.id, newUser.email)
 
@@ -68,6 +75,21 @@ class UserController {
 
         res.json(token)
     }
+
+    async activate(req, res, next){
+        const activationLink = req.params.link 
+        const user = await User.findOne({where:{activationLink:activationLink}})
+        user.activeted = true
+        user?.save()
+        res.json(user)
+        console.log("activated")
+
+    }
+
+    async check(req, res, next){
+
+        res.json({message:"ALL correct!"})
+    }
     
     async create(req, res) {
 
@@ -90,6 +112,8 @@ class UserController {
                 last_name,
                 avatar: '/uploads/' + photoFileName
             });
+
+            
             res.status(201).json(user);
         } catch (err) {
             console.error('Ошибка при создании:', err);

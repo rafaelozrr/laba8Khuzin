@@ -27,6 +27,14 @@ const User = seq.define("user", {
     avatar: {
         type: Sequelize.STRING,
         allowNull: false
+    },
+    activationLink: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    activeted: {
+        type: Sequelize.STRING,
+        allowNull: false
     }
 });
 
