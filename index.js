@@ -11,8 +11,9 @@ const PORT = 8000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static('uploads'));
-app.use(fileUpload({}));
 app.use("/api", router);
+app.use(fileUpload({}));
+
 
 console.log('переменная окружения name:', process.env.NAME);
 

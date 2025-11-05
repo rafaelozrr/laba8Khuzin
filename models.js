@@ -35,7 +35,12 @@ const User = seq.define("user", {
     activeted: {
         type: Sequelize.STRING,
         allowNull: false
+    },
+        resetPasswordToken: {
+        type: Sequelize.STRING,
+        allowNull: true
     }
+
 });
 
 // Категории

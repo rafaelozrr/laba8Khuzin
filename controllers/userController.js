@@ -9,7 +9,9 @@ import mailService from '../mailService.js'
 const getToken = (id, email)=>{
     return jwt.sign({id, email}, String(process.env.PRIVATEKEY), {expiresIn:'10h'})
 }
-
+const getResetToken = (id, email)=>{
+    return jwt.sign({id, email}, String(process.env.RESET_PASSWORD_KEY), {expiresIn:'1h'})
+}
 class UserController {
 
     async registration(req, res, next){
@@ -84,6 +86,63 @@ class UserController {
         res.json(user)
         console.log("activated")
 
+    }
+
+
+async forgotPassword(req, res){
+    try {
+        console.log('BODY:', req.body);
+        const {email} = req.body
+        
+        if (!email) {
+            return res.status(400).json({message: 'Email обязателен'})
+        }
+
+        const user = await User.findOne({where: {email}})
+
+        if (!user){
+            return res.status(404).json({message: 'Пользователь с таким email не зарегистрирован'})
+        }
+
+        const resetToken = getResetToken(user.id, user.email)
+        user.resetPasswordToken = resetToken 
+        await user.save()
+        
+        const resetLink = `http://${process.env.HOST}:${process.env.PORT}/api/reset-password/${resetToken}`
+        
+        await mailService.sendPasswordRecoveryLink(user.email, resetLink)
+
+        return res.status(200).json({message: 'Ссылка на восстановление пароля отправлена на ваш email'})
+        
+    } catch(error) {
+        console.error('Ошибка в forgotPassword:', error)
+        return res.status(500).json({message: 'Не удалось отправить ссылку на восстановление пароля. Попробуйте позже'})
+    }
+}
+
+    async resetPassword(req, res){
+        try{
+            const {password} = req.body
+            const {token} = req.params
+
+            const user = await User.findOne({where:{
+                resetPasswordToken: token
+            }})
+
+            const decod = jwt.verify(token, process.env.RESET_PASSWORD_KEY)
+
+            if (!decod){
+                return res.status(500).json({message:'Полученный токен не валиден'})
+            }
+
+            user.password = await bcrypt.hash(password,3)
+            user.resetPasswordToken = undefined
+            await user?.save()
+        }catch(error){
+            return res.status(500).json({message:'Полученный токен не валиден'})
+        }
+
+        return res.status(200).json({message:'Пароль успешно изменен'})
     }
 
     async check(req, res, next){
