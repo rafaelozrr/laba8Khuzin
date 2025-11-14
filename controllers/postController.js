@@ -1,4 +1,4 @@
-import { Post } from "../models.js"; // предполагается, что у тебя есть модель Post
+import { Post } from "../models.js"; 
 import { v4 as uuidv4 } from 'uuid';
 
 class PostController {

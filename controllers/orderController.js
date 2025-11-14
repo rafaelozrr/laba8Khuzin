@@ -1,7 +1,7 @@
 import { Order, OrderItem, Product, User } from "../models.js";
 
 class OrderController {
-    // Создать заказ (в теле: userId, items: [{productId, quantity}])
+
     async create(req, res) {
         try {
             const { userId, items } = req.body;
@@ -9,7 +9,7 @@ class OrderController {
                 return res.status(400).json({ message: "userId и items обязательны" });
             }
 
-            // считаем сумму и создаем заказ
+
             let total = 0;
             const order = await Order.create({ userId, amount: 0, status: "pending" });
 
@@ -27,7 +27,7 @@ class OrderController {
                     quantity
                 });
 
-                // уменьшаем склад (если задано)
+
                 if (product.stock_quantity != null) {
                     product.stock_quantity = Math.max(0, product.stock_quantity - quantity);
                     await product.save();
@@ -47,7 +47,7 @@ class OrderController {
         }
     }
 
-    // Получить все заказы (админ)
+
     async getAll(req, res) {
         try {
             const orders = await Order.findAll({
@@ -60,7 +60,7 @@ class OrderController {
         }
     }
 
-    // Получить заказы конкретного пользователя по userId (query или params)
+
     async getUserOrders(req, res) {
         try {
             const userId = req.params.userId || req.query.userId;
@@ -78,7 +78,7 @@ class OrderController {
         }
     }
 
-    // Получить один заказ с товарами
+
     async getOne(req, res) {
         try {
             const order = await Order.findByPk(req.params.id, {
@@ -91,7 +91,7 @@ class OrderController {
         }
     }
 
-    // Обновить статус/данные заказа
+
     async update(req, res) {
         try {
             const { id, status } = req.body;

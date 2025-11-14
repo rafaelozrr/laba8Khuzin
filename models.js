@@ -101,7 +101,7 @@ const Product = seq.define("product", {
     }
 });
 
-// Посты (уже был)
+// Посты 
 const Post = seq.define("post", {
     id: {
         type: Sequelize.INTEGER,
@@ -118,7 +118,7 @@ const Post = seq.define("post", {
     }
 });
 
-// Order (заказы)
+// Заказы
 const Order = seq.define("order", {
     id: {
         type: Sequelize.INTEGER,
@@ -142,7 +142,7 @@ const Order = seq.define("order", {
     }
 });
 
-// OrderItem (товары в заказе)
+// Товары в заказе
 const OrderItem = seq.define("order_item", {
     id: {
         type: Sequelize.INTEGER,
@@ -160,7 +160,7 @@ const OrderItem = seq.define("order_item", {
     }
 });
 
-// Review (отзывы)
+// Отзывы
 const Review = seq.define("review", {
     id: {
         type: Sequelize.INTEGER,
@@ -184,7 +184,6 @@ Product.belongsTo(Category);
 User.hasMany(Post, {onDelete: "CASCADE"});
 Post.belongsTo(User);
 
-/* Новые связи */
 User.hasMany(Order, { onDelete: "CASCADE" });
 Order.belongsTo(User);
 

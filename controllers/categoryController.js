@@ -12,7 +12,7 @@ class CategoryController {
 
             const category = await Category.create({ name, description });
 
-            // Возвращаем только нужные поля
+
             res.status(201).json({
                 id: category.id,
                 name: category.name,
@@ -23,7 +23,7 @@ class CategoryController {
         }
     }
 
-    // Получить все категории
+
     async getAll(req, res) {
         try {
             const categories = await Category.findAll({
@@ -35,7 +35,7 @@ class CategoryController {
         }
     }
 
-    // Обновление категории
+
     async update(req, res) {
         try {
             const { id, name, description } = req.body;
@@ -57,7 +57,7 @@ class CategoryController {
         }
     }
 
-    // Удаление категории
+
     async delete(req, res) {
         try {
             const { id } = req.params;

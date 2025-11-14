@@ -1,7 +1,7 @@
 import { Product, Category, User } from "../models.js";
 
 class ProductController {
-    // Создание продукта
+
     async create(req, res) {
         try {
             const { name, flavor, weight, price, country, categoryId, userId, image, description, stock_quantity } = req.body;
@@ -41,7 +41,7 @@ class ProductController {
         }
     }
 
-    // Получение продуктов с фильтром и пагинацией
+
     async getAll(req, res) {
         try {
             const { categoryId, page = 1, limit = 10 } = req.query;
@@ -94,7 +94,7 @@ class ProductController {
         }
     }
 
-    // Получение одного продукта
+
     async getOne(req, res) {
         try {
             const product = await Product.findByPk(req.params.id, {
@@ -123,7 +123,7 @@ class ProductController {
         }
     }
 
-    // Обновление продукта
+
     async update(req, res) {
         try {
             const { id, name, flavor, weight, price, country, categoryId, userId, image, description, stock_quantity } = req.body;
@@ -161,7 +161,7 @@ class ProductController {
         }
     }
 
-    // Удаление продукта
+
     async delete(req, res) {
         try {
             const product = await Product.findByPk(req.params.id);
