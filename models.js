@@ -36,11 +36,10 @@ const User = seq.define("user", {
         type: Sequelize.STRING,
         allowNull: false
     },
-        resetPasswordToken: {
+    resetPasswordToken: {
         type: Sequelize.STRING,
         allowNull: true
     }
-
 });
 
 // Категории
@@ -53,6 +52,10 @@ const Category = seq.define("category", {
     name: {
         type: Sequelize.STRING,
         allowNull: false
+    },
+    description: {
+        type: Sequelize.TEXT,
+        allowNull: true
     }
 });
 
@@ -69,11 +72,11 @@ const Product = seq.define("product", {
     },
     flavor: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
     },
     weight: {
         type: Sequelize.FLOAT,
-        allowNull: false
+        allowNull: true
     },
     price: {
         type: Sequelize.FLOAT,
@@ -81,11 +84,24 @@ const Product = seq.define("product", {
     },
     country: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
+    },
+    image: {
+        type: Sequelize.STRING,
+        allowNull: true
+    },
+    description: {
+        type: Sequelize.TEXT,
+        allowNull: true
+    },
+    stock_quantity: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        defaultValue: 0
     }
 });
 
-
+// Посты (уже был)
 const Post = seq.define("post", {
     id: {
         type: Sequelize.INTEGER,
@@ -102,6 +118,60 @@ const Post = seq.define("post", {
     }
 });
 
+// Order (заказы)
+const Order = seq.define("order", {
+    id: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+    },
+    date: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.NOW
+    },
+    amount: {
+        type: Sequelize.FLOAT,
+        allowNull: false,
+        defaultValue: 0
+    },
+    status: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: "pending" 
+    }
+});
+
+// OrderItem (товары в заказе)
+const OrderItem = seq.define("order_item", {
+    id: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+    },
+    price_at_a_time: {
+        type: Sequelize.FLOAT,
+        allowNull: false
+    },
+    quantity: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 1
+    }
+});
+
+// Review (отзывы)
+const Review = seq.define("review", {
+    id: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+    },
+    text: {
+        type: Sequelize.TEXT,
+        allowNull: true
+    }
+});
 
 
 
@@ -114,4 +184,20 @@ Product.belongsTo(Category);
 User.hasMany(Post, {onDelete: "CASCADE"});
 Post.belongsTo(User);
 
-export { User, Category, Product, Post };
+/* Новые связи */
+User.hasMany(Order, { onDelete: "CASCADE" });
+Order.belongsTo(User);
+
+Order.hasMany(OrderItem, { onDelete: "CASCADE" });
+OrderItem.belongsTo(Order);
+
+Product.hasMany(OrderItem, { onDelete: "CASCADE" });
+OrderItem.belongsTo(Product);
+
+User.hasMany(Review, { onDelete: "CASCADE" });
+Review.belongsTo(User);
+
+Product.hasMany(Review, { onDelete: "CASCADE" });
+Review.belongsTo(Product);
+
+export { User, Category, Product, Post, Order, OrderItem, Review };

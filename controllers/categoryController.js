@@ -1,39 +1,63 @@
 import { Category } from "../models.js";
 
 class CategoryController {
+    // Создание категории
     async create(req, res) {
         try {
-            const { name } = req.body;
-            const category = await Category.create({ name });
-            res.status(201).json(category);
+            const { name, description } = req.body;
+
+            if (!name) {
+                return res.status(400).json({ error: "Поле 'name' обязательно" });
+            }
+
+            const category = await Category.create({ name, description });
+
+            // Возвращаем только нужные поля
+            res.status(201).json({
+                id: category.id,
+                name: category.name,
+                description: category.description
+            });
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
     }
 
+    // Получить все категории
     async getAll(req, res) {
         try {
-            const categories = await Category.findAll();
+            const categories = await Category.findAll({
+                attributes: ["id", "name", "description"]
+            });
             res.json(categories);
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
     }
 
+    // Обновление категории
     async update(req, res) {
         try {
-            const { id, name } = req.body;
+            const { id, name, description } = req.body;
             const category = await Category.findByPk(id);
             if (!category) return res.status(404).json({ error: "Category not found" });
 
-            category.name = name;
+            category.name = name ?? category.name;
+            category.description = description ?? category.description;
+
             await category.save();
-            res.json(category);
+
+            res.json({
+                id: category.id,
+                name: category.name,
+                description: category.description
+            });
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
     }
 
+    // Удаление категории
     async delete(req, res) {
         try {
             const { id } = req.params;
